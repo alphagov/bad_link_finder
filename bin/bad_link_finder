@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require 'bad_link_finder'
+
+begin
+  BadLinkFinder.run
+rescue BadLinkFinder::EnvironmentVariableError => e
+  abort "Please check your environment variables: #{e.message}"
+end
