@@ -6,13 +6,24 @@ module BadLinkFinder
       @path = strip_html_ending(path)
 
       file = mirror_dir + path
-      doc = Nokogiri::HTML(file.read)
-      @links = doc.css('a').map do |a|
+      @doc = Nokogiri::HTML(file.read)
+    end
+
+    attr_reader :path
+
+    def links
+      @links ||= @doc.css('a').map do |a|
         strip_html_ending(a['href']) unless ignore_link?(a['href'])
       end.compact
     end
 
-    attr_reader :path, :links
+    def id
+      @id ||= begin
+        if (article = @doc.xpath('(//article[not(ancestor::article)])').first)
+          article['id']
+        end
+      end
+    end
 
   protected
 

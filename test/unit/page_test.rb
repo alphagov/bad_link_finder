@@ -46,6 +46,12 @@ describe BadLinkFinder::Page do
     end
   end
 
+  describe '#page_id' do
+    it "returns the id of the first topmost article" do
+      assert_equal 'correct-article-id', build_page('example/relative-example.html').id
+    end
+  end
+
   def build_page(path)
     site_mirror = FIXTURES_ROOT+'www.example.com'
     BadLinkFinder::Page.new(site_mirror, path)

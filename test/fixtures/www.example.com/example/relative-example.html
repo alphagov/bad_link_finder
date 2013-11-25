@@ -2,13 +2,23 @@
 <html>
   <head><title>Example site</title></head>
   <body>
-    <!-- Included -->
-    <a href='/example/index.html?test=true&redirect=http://www.example.com/in-param-url/index.html#section-1'></a>
-    <a href=''></a>
+    <article id='correct-article-id'>
+      <!-- Included -->
+      <a href='/example/index.html?test=true&redirect=http://www.example.com/in-param-url/index.html#section-1'></a>
+      <a href=''></a>
 
-    <!-- Excluded -->
-    <a></a>
-    <a href='#section-2'></a>
-    <a href='mailto:test@example.com'></a>
+      <article id='incorrect-sub-article-id'>
+        <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+      </article>
+
+      <!-- Excluded -->
+      <a></a>
+      <a href='#section-2'></a>
+      <a href='mailto:test@example.com'></a>
+    </article>
+
+    <article id='incorrect-second-article-id'>
+      Praesent commodo cursus magna, vel scelerisque nisl consectetur et.
+    </article>
   </body>
 </html>
