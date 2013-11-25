@@ -20,7 +20,8 @@ describe BadLinkFinder do
 
     csv_string = File.read(ENV['REPORT_OUTPUT_FILE'])
 
-    assert_match 'http://www.example.com/example/', csv_string
+    assert_match 'http://www.example.com/example/relative-example', csv_string
+    assert_match 'correct-article-id', csv_string
   end
 
   it "complains if key variables are missing" do
