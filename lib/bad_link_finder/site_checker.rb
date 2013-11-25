@@ -17,7 +17,15 @@ module BadLinkFinder
         puts "Checking page #{page.path} as #{page_checker.page_url}"
 
         bad_links = page_checker.bad_links
-        bad_link_map[page_checker.page_url] = bad_links if bad_links.any?
+
+        if bad_links.any?
+          page_info = {
+            id: page.id,
+            url: page_checker.page_url
+          }
+
+          bad_link_map[page_info] = bad_links
+        end
       end
 
       return bad_link_map
