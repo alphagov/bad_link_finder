@@ -29,7 +29,7 @@ module BadLinkFinder
     rescue Mechanize::RobotsDisallowedError => exception
       record_error("This link is blocked by robots.txt or nofollow attributes", exception)
     rescue Mechanize::Error, Net::HTTP::Persistent::Error, Timeout::Error, Errno::EINVAL,
-           Errno::ECONNRESET, EOFError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,
+           Errno::ECONNRESET, Errno::ETIMEDOUT, EOFError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,
            Net::ProtocolError, OpenSSL::SSL::SSLError, SocketError => exception # Thanks Net::HTTP
       record_error("The server failed to serve this page properly", exception)
     end
