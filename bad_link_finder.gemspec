@@ -19,8 +19,6 @@ Gem::Specification.new do |spec|
   spec.test_files    = Dir.glob('test/**/*')
   spec.require_paths = ["lib"]
 
-  spec.required_rubygems_version = ">= 2.1.11"
-
   spec.add_dependency "mechanize", "~> 2.7"
   spec.add_dependency "nokogiri", "~> 1.6"
 
