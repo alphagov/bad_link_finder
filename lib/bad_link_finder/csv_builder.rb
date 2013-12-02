@@ -2,21 +2,22 @@ require 'csv'
 
 module BadLinkFinder
   class CSVBuilder
-    def initialize(bad_link_map)
-      @bad_link_map = bad_link_map
+    def initialize(csv_output_file)
+      @csv = CSV.new(csv_output_file, encoding: 'UTF-8')
+
+      @csv << ['page_url', 'page_id', 'link', 'error_message', 'raw_error_message']
     end
 
-    def to_s
-      @to_s ||= CSV.generate(encoding: 'UTF-8') do |csv|
-        csv << ['page_url', 'page_id', 'link', 'error_message', 'raw_error_message']
+    def <<(csv_data)
+      link = csv_data[:link]
 
-        @bad_link_map.each do |page_info, bad_links|
-          bad_links.each do |bad_link|
-            exception_message = bad_link.exception.message if bad_link.exception
-            csv << [page_info[:url], page_info[:id], bad_link.link, bad_link.error_message, exception_message]
-          end
-        end
-      end
+      @csv << [
+        csv_data[:url],
+        csv_data[:id],
+        link.link,
+        link.error_message,
+        (link.exception.message if link.exception)
+      ]
     end
   end
 end
