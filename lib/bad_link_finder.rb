@@ -10,14 +10,17 @@ module BadLinkFinder
 
     raise EnvironmentVariableError.new("MIRROR_DIR '#{ENV['MIRROR_DIR']}' does not exist") unless Dir.exist?(ENV['MIRROR_DIR'])
 
-    bad_link_map = BadLinkFinder::SiteChecker.new(ENV['MIRROR_DIR'], ENV['SITE_HOST']).run
-    csv_builder = CSVBuilder.new(bad_link_map)
-
     report_path = Pathname.new(ENV['REPORT_OUTPUT_FILE'])
     report_path.parent.mkpath
-    report_path.open('w') do |file|
-      file.write(csv_builder)
-    end
+
+    csv_file = report_path.open('w')
+    csv_builder = BadLinkFinder::CSVBuilder.new(csv_file)
+
+    BadLinkFinder::SiteChecker.new(ENV['MIRROR_DIR'], ENV['SITE_HOST'], csv_builder).run
+
+    csv_file.close
+
+    nil
   end
 
   class EnvironmentVariableError < ArgumentError; end

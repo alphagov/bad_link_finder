@@ -1,44 +1,101 @@
 require 'test_helper'
 require 'bad_link_finder/csv_builder'
+
+require 'tempfile'
 require 'ostruct'
 require 'csv'
 
 describe BadLinkFinder::CSVBuilder do
 
-  it "flattens out the bad links map into a CSV structure" do
-    bad_link_map = {
-      {url: 'http://www.example.com/example/', id: 'some-article-id'} => [
-        mock_link(link: 'https://www.example.net/external-example.html', error_message: "This link returned a 404", exception: TestException.new('404 not found')),
-        mock_link(link: 'relative-example', error_message: "Nope")
-      ],
-      {url: 'http://www.example.com/example/relative-example'} => [
-        mock_link(
+  before do
+    @report_output_file = Tempfile.new('csv')
+    @report_output_file.unlink
+  end
+
+  after do
+    @report_output_file.close
+  end
+
+  it "writes headers to the output file on creation" do
+    BadLinkFinder::CSVBuilder.new(@report_output_file)
+    @report_output_file.rewind
+    parsed_csv = CSV.parse(@report_output_file.read)
+
+    assert_equal ['page_url', 'page_id', 'link', 'error_message', 'raw_error_message'], parsed_csv.shift
+    assert_empty parsed_csv
+  end
+
+  describe '#<<' do
+    it "writes a link to the CSV" do
+      csv_builder = BadLinkFinder::CSVBuilder.new(@report_output_file)
+
+      csv_builder << {
+        url: 'http://www.example.com/example/',
+        id: 'some-article-id',
+        link: mock_link(link: 'https://www.example.net/external-example.html', error_message: "This link returned a 404", exception: TestException.new('404 not found'))
+      }
+
+      @report_output_file.rewind
+      parsed_csv = CSV.parse(@report_output_file.read)
+
+      parsed_csv.shift # drop headers
+
+      assert_equal [
+        'http://www.example.com/example/',
+        'some-article-id',
+        'https://www.example.net/external-example.html',
+        'This link returned a 404',
+        '404 not found'
+      ], parsed_csv.shift
+    end
+
+    it "ignores missing exceptions" do
+      csv_builder = BadLinkFinder::CSVBuilder.new(@report_output_file)
+
+      csv_builder << {
+        url: 'http://www.example.com/example/',
+        id: 'some-article-id',
+        link: mock_link(link: 'relative-example', error_message: "Nope")
+      }
+
+      @report_output_file.rewind
+      parsed_csv = CSV.parse(@report_output_file.read)
+
+      parsed_csv.shift # drop headers
+
+      assert_equal [
+        'http://www.example.com/example/',
+        'some-article-id',
+        'relative-example',
+        'Nope',
+        nil
+      ], parsed_csv.shift
+    end
+
+    it "ignores missing ids" do
+      csv_builder = BadLinkFinder::CSVBuilder.new(@report_output_file)
+
+      csv_builder << {
+        url: 'http://www.example.com/example/relative-example',
+        link: mock_link(
           link: '/example/?test=true&redirect=http://www.example.com/in-param-url/index.html#section-1',
-          error_message: "What even is this?",
+          error_message: 'What even is this?',
           exception: TestException.new('Test exception')
         )
-      ]
-    }
+      }
 
-    csv_builder = BadLinkFinder::CSVBuilder.new(bad_link_map)
+      @report_output_file.rewind
+      parsed_csv = CSV.parse(@report_output_file.read)
 
-    parsed_csv = CSV.parse(csv_builder.to_s)
+      parsed_csv.shift # drop headers
 
-    headers = parsed_csv.shift
-    assert_equal ['page_url', 'page_id', 'link', 'error_message', 'raw_error_message'], headers
-
-    assert_equal bad_link_map.values.flatten.count, parsed_csv.count
-
-    bad_link_map.each do |page_info, links|
-      links.each do |link|
-        assert parsed_csv.include?([
-          page_info[:url],
-          page_info[:id],
-          link.link,
-          link.error_message,
-          (link.exception.message if link.exception),
-        ])
-      end
+      assert_equal [
+        'http://www.example.com/example/relative-example',
+        nil,
+        '/example/?test=true&redirect=http://www.example.com/in-param-url/index.html#section-1',
+        'What even is this?',
+        'Test exception'
+      ], parsed_csv.shift
     end
   end
 

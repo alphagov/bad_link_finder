@@ -4,31 +4,28 @@ require 'bad_link_finder/page_checker'
 
 module BadLinkFinder
   class SiteChecker
-    def initialize(mirror_dir, host)
+    def initialize(mirror_dir, host, csv_builder)
       @mirror_dir = File.expand_path(mirror_dir)
       @host = host
+      @csv_builder = csv_builder
       @result_cache = BadLinkFinder::ResultCache.new
     end
 
     def run
-      bad_link_map = {}
-      BadLinkFinder::Site.new(@mirror_dir).map do |page|
+      BadLinkFinder::Site.new(@mirror_dir).each do |page|
         page_checker = BadLinkFinder::PageChecker.new(@host, page, @result_cache)
         puts "Checking page #{page.path} as #{page_checker.page_url}"
 
-        bad_links = page_checker.bad_links
-
-        if bad_links.any?
-          page_info = {
+        page_checker.each_bad_link do |link|
+          @csv_builder << {
+            url: page_checker.page_url,
             id: page.id,
-            url: page_checker.page_url
+            link: link
           }
-
-          bad_link_map[page_info] = bad_links
         end
       end
 
-      return bad_link_map
+      nil
     end
   end
 end
