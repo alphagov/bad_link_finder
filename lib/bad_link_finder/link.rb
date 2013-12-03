@@ -46,6 +46,7 @@ module BadLinkFinder
 
       browser = Mechanize.new
       browser.user_agent = 'GOV.UK link checker'
+      browser.keep_alive = false
 
       if @head_unsupported
         browser.get(@url)
