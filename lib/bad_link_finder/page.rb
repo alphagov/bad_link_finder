@@ -5,9 +5,9 @@ module BadLinkFinder
     def initialize(mirror_dir, path)
       @path = strip_html_ending(path)
 
-      file = mirror_dir + path
-      @doc = Nokogiri::HTML(file.read)
-      file.close
+      File.open(mirror_dir + path) do |file|
+        @doc = Nokogiri::HTML(file.read)
+      end
     end
 
     attr_reader :path
