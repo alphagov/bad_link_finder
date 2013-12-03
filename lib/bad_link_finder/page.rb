@@ -7,6 +7,7 @@ module BadLinkFinder
 
       file = mirror_dir + path
       @doc = Nokogiri::HTML(file.read)
+      file.close
     end
 
     attr_reader :path
