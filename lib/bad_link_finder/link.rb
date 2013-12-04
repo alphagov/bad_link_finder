@@ -9,6 +9,7 @@ module BadLinkFinder
       @link = link
       @url = get_url_from_link(link)
 
+      verify_url(@url)
       validate_with_request
 
     rescue URI::InvalidURIError => exception
@@ -58,6 +59,12 @@ module BadLinkFinder
 
     def get_url_from_link(link)
       URI.join(@page_url, link).to_s
+    end
+
+    def verify_url(url)
+      if url.start_with?('http')
+        raise URI::InvalidURIError.new("The URL #{url} should start with http:// or https://") unless url =~ %r{^https?://}
+      end
     end
 
     def record_error(message, exception = nil)

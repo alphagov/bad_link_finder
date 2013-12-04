@@ -27,10 +27,17 @@ describe BadLinkFinder::Link do
     end
 
     it "reports malformed links without checking the internet" do
-      link = build_link('htt[]://{an-example-path}')
+      hrefs = [
+        'htt[]://{an-example-path}',
+        'http:www.example.com'
+      ]
 
-      refute link.valid?
-      assert_equal "This link is in a bad format", link.error_message
+      hrefs.each do |href|
+        link = build_link(href)
+
+        refute link.valid?
+        assert_equal "This link is in a bad format", link.error_message
+      end
     end
 
     it "reports links returning failure status codes" do
