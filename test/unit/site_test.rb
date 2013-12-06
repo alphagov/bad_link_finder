@@ -17,6 +17,16 @@ describe BadLinkFinder::Site do
 
       assert_same_elements site_map, BadLinkFinder::Site.new(@site_mirror).map { |page| page.path.to_s }
     end
+
+    it "starts from a specific path if given" do
+      site_map = [
+        'example/relative-example',
+        ''
+      ]
+
+      site = BadLinkFinder::Site.new(@site_mirror, 'example/relative-example.html')
+      assert_equal site_map, site.map { |page| page.path.to_s }
+    end
   end
 
 end
