@@ -16,7 +16,7 @@ module BadLinkFinder
     csv_file = report_path.open('w')
     csv_builder = BadLinkFinder::CSVBuilder.new(csv_file)
 
-    BadLinkFinder::SiteChecker.new(ENV['MIRROR_DIR'], ENV['SITE_HOST'], csv_builder).run
+    BadLinkFinder::SiteChecker.new(ENV['MIRROR_DIR'], ENV['SITE_HOST'], csv_builder, ENV['START_FROM']).run
 
     csv_file.close
 
