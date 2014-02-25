@@ -21,7 +21,7 @@ describe BadLinkFinder::CSVBuilder do
     @report_output_file.rewind
     parsed_csv = CSV.parse(@report_output_file.read)
 
-    assert_equal ['page_url', 'page_id', 'link', 'error_message', 'raw_error_message'], parsed_csv.shift
+    assert_equal ['page_url', 'page_id', 'bad_link_count', 'link', 'error_message', 'raw_error_message'], parsed_csv.shift
     assert_empty parsed_csv
   end
 
@@ -32,6 +32,7 @@ describe BadLinkFinder::CSVBuilder do
       csv_builder << {
         url: 'http://www.example.com/example/',
         id: 'some-article-id',
+        bad_link_count: 1,
         link: mock_link(link: 'https://www.example.net/external-example.html', error_message: "This link returned a 404", exception: TestException.new('404 not found'))
       }
 
@@ -43,6 +44,7 @@ describe BadLinkFinder::CSVBuilder do
       assert_equal [
         'http://www.example.com/example/',
         'some-article-id',
+        '1',
         'https://www.example.net/external-example.html',
         'This link returned a 404',
         '404 not found'
@@ -55,6 +57,7 @@ describe BadLinkFinder::CSVBuilder do
       csv_builder << {
         url: 'http://www.example.com/example/',
         id: 'some-article-id',
+        bad_link_count: 2,
         link: mock_link(link: 'relative-example', error_message: "Nope")
       }
 
@@ -66,6 +69,7 @@ describe BadLinkFinder::CSVBuilder do
       assert_equal [
         'http://www.example.com/example/',
         'some-article-id',
+        '2',
         'relative-example',
         'Nope',
         nil
@@ -77,6 +81,7 @@ describe BadLinkFinder::CSVBuilder do
 
       csv_builder << {
         url: 'http://www.example.com/example/relative-example',
+        bad_link_count: 1,
         link: mock_link(
           link: '/example/?test=true&redirect=http://www.example.com/in-param-url/index.html#section-1',
           error_message: 'What even is this?',
@@ -92,6 +97,7 @@ describe BadLinkFinder::CSVBuilder do
       assert_equal [
         'http://www.example.com/example/relative-example',
         nil,
+        '1',
         '/example/?test=true&redirect=http://www.example.com/in-param-url/index.html#section-1',
         'What even is this?',
         'Test exception'

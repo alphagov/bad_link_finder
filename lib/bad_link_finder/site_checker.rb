@@ -21,6 +21,7 @@ module BadLinkFinder
           @csv_builder << {
             url: page_checker.page_url,
             id: page.id,
+            bad_link_count: page_checker.bad_link_count,
             link: link
           }
         end

@@ -25,5 +25,10 @@ module BadLinkFinder
         end.compact
       end
     end
+
+    def bad_link_count
+      each_bad_link {|_|} unless @bad_links
+      @bad_links.size
+    end
   end
 end
