@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "mechanize", "~> 2.7"
-  spec.add_dependency "nokogiri", "~> 1.6"
+  spec.add_dependency "nokogiri", "~> 1.5"
 
   spec.add_development_dependency "minitest"
   spec.add_development_dependency "webmock"
