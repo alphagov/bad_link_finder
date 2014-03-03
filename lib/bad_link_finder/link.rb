@@ -15,7 +15,7 @@ module BadLinkFinder
     rescue URI::InvalidURIError => exception
       record_error("This link is in a bad format", exception)
     rescue Mechanize::ResponseCodeError => exception
-      if exception.response_code.to_i == 405 && !@head_unsupported
+      if [405, 500].include?(exception.response_code.to_i)  && !@head_unsupported
         @head_unsupported = true
         retry
       else
