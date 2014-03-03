@@ -63,6 +63,14 @@ describe BadLinkFinder::Link do
 
       assert link.valid?
     end
+
+    it "retries 500s as GET requests" do
+      stub_request(:head, "http://www.example.com/an-example-path").to_return(status: 500)
+      stub_request(:get, "http://www.example.com/an-example-path").to_return(status: 200)
+      link = build_link('/an-example-path')
+
+      assert link.valid?
+    end
   end
 
   def stub_url(url, status)
