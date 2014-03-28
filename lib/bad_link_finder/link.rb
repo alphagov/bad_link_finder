@@ -53,7 +53,7 @@ module BadLinkFinder
       browser.keep_alive = false
       browser.history.max_size = 0
       browser.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      browser.agent.open_timeout = 30
+      browser.agent.open_timeout = 15
 
       if @head_unsupported
         browser.get(@url)
