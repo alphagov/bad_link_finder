@@ -1,4 +1,5 @@
 require 'mechanize'
+require 'openssl'
 
 module BadLinkFinder
   class Link
@@ -33,6 +34,8 @@ module BadLinkFinder
            Errno::ECONNRESET, Errno::ETIMEDOUT, EOFError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError,
            Net::ProtocolError, OpenSSL::SSL::SSLError, SocketError => exception # Thanks Net::HTTP
       record_error("The server failed to serve this page properly", exception)
+    rescue Exception => exception
+      record_error("Some other exception happened", exception)
     end
 
     def valid?
@@ -49,6 +52,8 @@ module BadLinkFinder
       browser.user_agent = 'GOV.UK link checker'
       browser.keep_alive = false
       browser.history.max_size = 0
+      browser.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      browser.agent.open_timeout = 30
 
       if @head_unsupported
         browser.get(@url)
