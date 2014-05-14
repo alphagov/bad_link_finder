@@ -17,7 +17,7 @@ module BadLinkFinder
         page_checker = BadLinkFinder::PageChecker.new(@host, page, @result_cache)
         puts "Checking page #{page.path} as #{page_checker.page_url}"
 
-        page_checker.each_bad_link do |link|
+        page_checker.bad_links.each do |link|
           @csv_builder << {
             url: page_checker.page_url,
             id: page.id,

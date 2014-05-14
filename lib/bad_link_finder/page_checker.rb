@@ -11,19 +11,14 @@ module BadLinkFinder
 
     attr_reader :page_url
 
-    def each_bad_link(&block)
-      if @bad_links
-        @bad_links.each(&block)
-      else
-        @bad_links = @page.links.map do |raw_link|
-          link = @result_cache.fetch(raw_link) || @result_cache.store(raw_link, BadLinkFinder::Link.new(@page_url, raw_link))
+    def bad_links
+      @bad_links ||= @page.links.map do |raw_link|
+        link = @result_cache.fetch(raw_link) || @result_cache.store(raw_link, BadLinkFinder::Link.new(@page_url, raw_link))
 
-          unless link.valid?
-            yield link
-            next link
-          end
-        end.compact
-      end
+        unless link.valid?
+          next link
+        end
+      end.compact
     end
   end
 end
