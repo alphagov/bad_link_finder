@@ -5,7 +5,8 @@ module BadLinkFinder
   class Link
     attr_reader :link, :url, :error_message, :exception
 
-    def initialize(page_url, link)
+    def initialize(page_url, link, logger = BadLinkFinder::NullLogger.new)
+      @logger = logger
       @page_url = page_url
       @link = link
       @url = get_url_from_link(link)
@@ -45,7 +46,7 @@ module BadLinkFinder
   protected
 
     def validate_with_request
-      puts "-- testing link #{@link} using #{@url}"
+      @logger.info "-- testing link #{@link} using #{@url}"
       sleep 0.1 # Recommended pause for gov.uk rate limiting
 
       browser = Mechanize.new
@@ -76,7 +77,7 @@ module BadLinkFinder
       @error_message = message
       @exception = exception
 
-      puts "---- found broken link #{@url}: #{message}: #{exception.message if exception}"
+      @logger.info "---- found broken link #{@url}: #{message}: #{exception.message if exception}"
     end
   end
 end
